@@ -1,20 +1,17 @@
 import express from "express";
 import urlRoute from "./routes/url.js";
-import { connectToMongoDB } from "./connect.js";
+import connectToMongoDB from "./config/db.js";
+import indexRouter from "./routes/index.js";
 import URL from "./models/url.js";
 
 const app = express();
 const port = 8001;
 
-connectToMongoDB(
-  "mongodb+srv://23mce010:23mce010@cluster0.c6snc.mongodb.net/short_url"
-).then(() => {
-  console.log(`Mongodb connected`);
-});
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/url", urlRoute);
+app.use("/", indexRouter);
 
 app.get("/:shortId", async (req, res) => {
   const shortID = req.params.shortId;
@@ -34,5 +31,6 @@ app.get("/:shortId", async (req, res) => {
 });
 
 app.listen(port, () => {
+  connectToMongoDB();
   console.log(`Listening to port ${port}`);
 });
